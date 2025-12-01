@@ -1,6 +1,6 @@
 import solutions.adv_2025_00 as sol
-from . import test_utils as tu
 
+from . import test_utils as tu
 
 _INPUTS = tu.get_inputs(0, {"small", "p"})
 

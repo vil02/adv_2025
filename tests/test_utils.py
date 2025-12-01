@@ -1,8 +1,9 @@
 """general utilities for advent of code"""
 
-import pathlib
 import dataclasses
+import pathlib
 import typing
+
 import pytest
 
 

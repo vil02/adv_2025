@@ -16,7 +16,7 @@ dev = [
     "flake8-pytest-style==2.2.0",
     "flake8==7.3.0",
     "isort==7.0.0",
-    "mypy==1.18.2",
+    "mypy==1.19.0",
     "pylint==4.0.4",
     "pytest-xdist==3.8.0",
     "pytest==9.0.1",

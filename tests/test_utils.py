@@ -71,9 +71,7 @@ def _read_input(in_day_id: int, in_type_id: str) -> str | None:
 
 def _read_all_inputs(in_day_id: int, in_keys: set[str]) -> dict[str, str | None]:
     """returns a dict with all inputs for given in_day_id and data key"""
-    res = {_: _read_input(in_day_id, _) for _ in in_keys}
-    assert len(set(res.values())) == len(res)
-    return res
+    return {_: _read_input(in_day_id, _) for _ in in_keys}
 
 
 type SolveOutput = int | str

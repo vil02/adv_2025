@@ -46,34 +46,21 @@ def solve_a(in_str: str) -> int:
     return _count_accessible(_parse_input(in_str))
 
 
-def _remove_accessible(rolls: Rolls) -> tuple[Rolls, bool]:
-    removed = False
-    res = {}
+def _remove_accessible(rolls: Rolls) -> int:
+    removed = 0
     for pos, val in rolls.items():
-        if val == _FREE:
-            res[pos] = val
-        else:
-            assert val == _ROLL
-            if _is_accessible(rolls, pos):
-                res[pos] = _FREE
-                removed = True
-            else:
-                res[pos] = _ROLL
-    return res, removed
+        if val == _ROLL and _is_accessible(rolls, pos):
+            rolls[pos] = _FREE
+            removed += 1
+    return removed
 
 
-def _remove_all(rolls: Rolls) -> Rolls:
-    res, removed = _remove_accessible(rolls)
-    while removed:
-        res, removed = _remove_accessible(res)
-    return res
+def _remove_all(rolls: Rolls) -> int:
+    total_removed = 0
+    while (removed := _remove_accessible(rolls)) > 0:
+        total_removed += removed
+    return total_removed
 
 
 def solve_b(in_str: str) -> int:
-    rolls = _parse_input(in_str)
-    removed = _remove_all(rolls)
-    return sum(
-        1
-        for val_a, val_b in zip(rolls.values(), removed.values(), strict=True)
-        if val_a != val_b
-    )
+    return _remove_all(_parse_input(in_str))

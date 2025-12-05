@@ -1,10 +1,11 @@
-def _parse_range(in_str: str) -> tuple[int, int]:
-    start, end = in_str.split("-")
-    return int(start), int(end)
-
-
 def _parse_id(in_str: str) -> int:
     return int(in_str)
+
+
+def _parse_range(in_str: str) -> tuple[int, int]:
+    start, end = (_parse_id(_) for _ in in_str.split("-"))
+    assert start <= end
+    return start, end
 
 
 def _parse_ranges(in_str: str) -> list[tuple[int, int]]:
@@ -28,8 +29,32 @@ def _is_contained_in_any(ranges: list[tuple[int, int]], in_id: int) -> bool:
     return any(_is_contained(_, in_id) for _ in ranges)
 
 
+def _do_overlap(last_range: tuple[int, int], next_range: tuple[int, int]) -> bool:
+    return last_range[0] <= next_range[0] <= last_range[1]
+
+
+def _join(last_range: tuple[int, int], next_range: tuple[int, int]) -> tuple[int, int]:
+    assert _do_overlap(last_range, next_range)
+    return last_range[0], max(next_range[1], last_range[1])
+
+
+def _merge(ranges: list[tuple[int, int]]) -> list[tuple[int, int]]:
+    res = []
+    sorted_ranges = sorted(ranges)
+    last_range = sorted_ranges[0]
+    for cur_range in sorted_ranges[1:]:
+        if _do_overlap(last_range, cur_range):
+            last_range = _join(last_range, cur_range)
+        else:
+            res.append(last_range)
+            last_range = cur_range
+    res.append(last_range)
+    return res
+
+
 def solve_a(in_str: str) -> int:
     ranges, ids = _parse_input(in_str)
+    ranges = _merge(ranges)
     return sum(1 for id in ids if _is_contained_in_any(ranges, id))
 
 
@@ -38,20 +63,16 @@ def _number_of_elements(start: int, end: int) -> int:
     return end - start + 1
 
 
-def _number_of_elements_in_union(ranges: list[tuple[int, int]]) -> int:
-    cur_start = 1
-    cur_end = 1
-    res = -1
-    for start, end in sorted(ranges):
-        if cur_start <= start <= cur_end:
-            cur_end = max(end, cur_end)
-        else:
-            res += _number_of_elements(cur_start, cur_end)
-            cur_start = start
-            cur_end = end
-    res += _number_of_elements(cur_start, cur_end)
-    return res
+def _assert_merged(merged_ranges: list[tuple[int, int]]) -> None:
+    assert merged_ranges == sorted(merged_ranges)
+    for _prev, _next in zip(merged_ranges[:-1], merged_ranges[1:], strict=True):
+        assert _prev[1] < _next[0]
+
+
+def _number_of_elements_in_merged(merged_ranges: list[tuple[int, int]]) -> int:
+    _assert_merged(merged_ranges)
+    return sum(_number_of_elements(*_) for _ in merged_ranges)
 
 
 def solve_b(in_str: str) -> int:
-    return _number_of_elements_in_union(_parse_input(in_str)[0])
+    return _number_of_elements_in_merged(_merge(_parse_input(in_str)[0]))

@@ -17,7 +17,7 @@ do
         exit_code=1
     }
 
-    mypy_output=$(uv run mypy "${cur_file}" 2>&1) || {
+    mypy_output=$(uv run mypy --strict "${cur_file}" 2>&1) || {
         printf "Checking with mypy:\n%s\n" "${mypy_output}"
         exit_code=1
     }

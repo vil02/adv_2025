@@ -1,8 +1,8 @@
 import pytest
 
-import solutions.adv_2025_02 as sol
-
 from . import test_utils as tu
+
+sol = tu.import_solution(__file__)
 
 
 @pytest.mark.parametrize(
@@ -51,9 +51,7 @@ def test_is_valid_b_negative(in_num: int) -> None:
     assert not sol.is_valid_b(in_num)
 
 
-_INPUTS = tu.get_inputs(2, {"small", "p"})
-
-test_solve_a, test_solve_b = _INPUTS.get_tests(
+test_solve_a, test_solve_b = tu.get_inputs(__file__, {"small", "p"}).get_tests(
     (sol.solve_a, sol.solve_b),
     {"small": (1227775554, 4174379265), "p": (41294979841, 66500947346)},
 )

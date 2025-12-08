@@ -1,7 +1,9 @@
 """general utilities for advent of code"""
 
 import dataclasses
+import importlib
 import pathlib
+import types
 import typing
 
 import pytest
@@ -137,6 +139,15 @@ class _Inputs:
         )
 
 
-def get_inputs(in_day_id: int, in_keys: set[str]) -> _Inputs:
-    """returns an _Inputs object representing the data for given day/keys"""
-    return _Inputs(_read_all_inputs(in_day_id, in_keys))
+def _day_num(filename: str) -> int:
+    return int(filename.split("_")[-1].split(".")[0])
+
+
+def get_inputs(filename: str, in_keys: set[str]) -> _Inputs:
+    return _Inputs(_read_all_inputs(_day_num(filename), in_keys))
+
+
+def import_solution(filename: str) -> types.ModuleType:
+    return importlib.import_module(
+        f"solutions.{_project_code()}_{_day_id_str(_day_num(filename))}"
+    )

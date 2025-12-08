@@ -1,8 +1,8 @@
 import pytest
 
-import solutions.adv_2025_03 as sol
-
 from . import test_utils as tu
+
+sol = tu.import_solution(__file__)
 
 
 @pytest.mark.parametrize(
@@ -22,9 +22,7 @@ def test_max_joltage(bank: list[int], size: int, expected: int) -> None:
     assert sol.max_joltage(bank, size) == expected
 
 
-_INPUTS = tu.get_inputs(3, {"small", "p"})
-
-test_solve_a, test_solve_b = _INPUTS.get_tests(
+test_solve_a, test_solve_b = tu.get_inputs(__file__, {"small", "p"}).get_tests(
     (sol.solve_a, sol.solve_b),
     {"small": (357, 3121910778619), "p": (16858, 167549941654721)},
 )

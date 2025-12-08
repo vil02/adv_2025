@@ -1,8 +1,8 @@
-import solutions.adv_2025_06 as sol
-
 from . import test_utils as tu
 
-_INPUTS = tu.get_inputs(6, {"small", "p"})
+sol = tu.import_solution(__file__)
+
+_INPUTS = tu.get_inputs(__file__, {"small", "p"})
 
 _DATA_SMALL = _INPUTS.inputs["small"]
 

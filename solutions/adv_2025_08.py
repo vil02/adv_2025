@@ -1,5 +1,3 @@
-import collections
-import functools
 import itertools
 
 Pos = tuple[int, int, int]
@@ -23,23 +21,26 @@ def _sort_by_dist(positions: list[Pos]) -> list[tuple[Pos, Pos]]:
     return sorted(itertools.combinations(positions, 2), key=lambda _: _dist_2(*_))
 
 
-def _connect(circuits: dict[Pos, int], pos_a: Pos, pos_b: Pos) -> None:
+def _connect(
+    circuits: dict[Pos, int], components: dict[int, list[Pos]], pos_a: Pos, pos_b: Pos
+) -> None:
     if circuits[pos_a] != circuits[pos_b]:
+        circuit_a = circuits[pos_a]
         circuit_b = circuits[pos_b]
-        for pos in circuits:
-            if circuits[pos] == circuit_b:
-                circuits[pos] = circuits[pos_a]
+        for pos in components[circuit_b]:
+            circuits[pos] = circuit_a
+        components[circuits[pos_a]].extend(components[circuit_b])
+        del components[circuit_b]
 
 
-def _top_3(circuits: dict[Pos, int]) -> list[int]:
-    counter = collections.Counter(circuits.values())
-    x = sorted(counter.values(), reverse=True)
-
-    return x[:3]
+def _top_3(components: dict[int, list[Pos]]) -> tuple[list[Pos], list[Pos], list[Pos]]:
+    comp_a, comp_b, comp_c = sorted(components.values(), key=len, reverse=True)[:3]
+    return comp_a, comp_b, comp_c
 
 
-def _score(circuits: dict[Pos, int]) -> int:
-    return functools.reduce(lambda _a, _b: _a * _b, _top_3(circuits))
+def _score_a(components: dict[int, list[Pos]]) -> int:
+    comp_a, comp_b, comp_c = _top_3(components)
+    return len(comp_a) * len(comp_b) * len(comp_c)
 
 
 def _limit(positions: list[Pos]) -> int:
@@ -48,29 +49,36 @@ def _limit(positions: list[Pos]) -> int:
     return 1000
 
 
+def _initial_info(positions: list[Pos]) -> tuple[dict[Pos, int], dict[int, list[Pos]]]:
+    circuits = {_p: _n for _n, _p in enumerate(positions)}
+    components = {_n: [_p] for _n, _p in enumerate(positions)}
+    return circuits, components
+
+
 def solve_a(in_str: str) -> int:
     positions = _parse_input(in_str)
-    circuits = {_p: _n for _n, _p in enumerate(positions)}
-    connections = _sort_by_dist(positions)[: _limit(positions)]
-    for _ in connections:
-        _connect(circuits, *_)
-
-    return _score(circuits)
+    circuits, components = _initial_info(positions)
+    for _ in _sort_by_dist(positions)[: _limit(positions)]:
+        _connect(circuits, components, *_)
+    return _score_a(components)
 
 
-def _are_connected(circuits: dict[Pos, int]) -> bool:
-    return len(set(circuits.values())) == 1
+def _are_connected(components: dict[int, list[Pos]]) -> bool:
+    return len(components) == 1
+
+
+def _score_b(pos_a: Pos, pos_b: Pos) -> int:
+    return pos_a[0] * pos_b[0]
 
 
 def solve_b(in_str: str) -> int:
     positions = _parse_input(in_str)
-    circuits = {_p: _n for _n, _p in enumerate(positions)}
-    connections = _sort_by_dist(positions)
+    circuits, components = _initial_info(positions)
     connecting = None
-    for _ in connections:
-        _connect(circuits, *_)
-        if _are_connected(circuits):
+    for _ in _sort_by_dist(positions):
+        _connect(circuits, components, *_)
+        if _are_connected(components):
             connecting = _
             break
     assert connecting is not None
-    return connecting[0][0] * connecting[1][0]
+    return _score_b(*connecting)

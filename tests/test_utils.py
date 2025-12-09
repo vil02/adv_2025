@@ -151,3 +151,12 @@ def import_solution(filename: str) -> types.ModuleType:
     return importlib.import_module(
         f"solutions.{_project_code()}_{_day_id_str(_day_num(filename))}"
     )
+
+
+def regular_tests(
+    filename: str, in_key_to_all_expected: dict[str, tuple[SolveOutput, ...]]
+) -> tuple[typing.Callable[[str, SolveOutput], None], ...]:
+    sol = import_solution(filename)
+    return get_inputs(filename, set(in_key_to_all_expected.keys())).get_tests(
+        (sol.solve_a, sol.solve_b), in_key_to_all_expected
+    )

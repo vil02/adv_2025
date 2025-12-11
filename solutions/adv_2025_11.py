@@ -39,6 +39,7 @@ def solve_a(in_str: str) -> int:
 def _number_of_paths_visiting(
     graph: dict[str, list[str]], start: str, visit_a: str, visit_b: str, end: str
 ) -> int:
+    assert _number_of_paths(graph, visit_b, visit_a) == 0
     return (
         _number_of_paths(graph, start, visit_a)
         * _number_of_paths(graph, visit_a, visit_b)
@@ -47,7 +48,4 @@ def _number_of_paths_visiting(
 
 
 def solve_b(in_str: str) -> int:
-    graph = _parse_input(in_str)
-    return _number_of_paths_visiting(
-        graph, "svr", "fft", "dac", "out"
-    ) + _number_of_paths_visiting(graph, "svr", "dac", "fft", "out")
+    return _number_of_paths_visiting(_parse_input(in_str), "svr", "fft", "dac", "out")

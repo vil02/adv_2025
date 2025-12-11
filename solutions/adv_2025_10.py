@@ -1,8 +1,4 @@
-import collections
-import typing
-
-import numpy as np
-import scipy
+import z3  # type: ignore
 
 
 def _parse_button(in_str: str) -> list[int]:
@@ -49,46 +45,25 @@ def _parse_input(
     return [_parse_machine(_) for _ in in_str.splitlines()]
 
 
-def _toggle_single(in_str: str) -> str:
-    return {".": "#", "#": "."}[in_str]
-
-
-def _toggle(state: str, button: list[int]) -> str:
-    res = list(state)
-    for _ in button:
-        res[_] = _toggle_single(res[_])
-    return "".join(res)
-
-
-def _new_states(state: str, buttons: list[list[int]]) -> typing.Iterator[str]:
-    for _ in buttons:
-        yield _toggle(state, _)
-
-
-def _get_start_state(size: int) -> str:
-    return "".join("." for _ in range(size))
-
-
-def _early_exit_bsf(target: str, buttons: list[list[int]]) -> int | None:
-    start = _get_start_state(len(target))
-    assert start != target
-    visited = set()
-    queue = collections.deque([(start, 0)])
-    while queue:
-        cur_state, moves = queue.popleft()
-        for new_state in _new_states(cur_state, buttons):
-            if new_state == target:
-                return moves + 1
-            if new_state not in visited:
-                visited.add(new_state)
-                queue.append((new_state, moves + 1))
-    return None
-
-
 def _minimal_number_of_presses_a(target: str, buttons: list[list[int]]) -> int:
-    res = _early_exit_bsf(target, buttons)
-    assert res is not None
-    return res
+    opt = z3.Optimize()
+    presses = []
+    for b_num in range(len(buttons)):
+        press = z3.Int(f"p_{b_num}")
+        opt.add(press >= 0)
+        presses.append(press)
+    opt.minimize(sum(presses))
+
+    for num, goal in enumerate(target):
+        this_sum = []
+        for b_num, button in enumerate(buttons):
+            if num in button:
+                this_sum.append(presses[b_num])
+        opt.add(sum(this_sum) % 2 == {".": 0, "#": 1}[goal])
+
+    assert opt.check() == z3.sat
+    model = opt.model()
+    return sum(model[press].as_long() for press in presses)
 
 
 def solve_a(in_str: str) -> int:
@@ -98,36 +73,27 @@ def solve_a(in_str: str) -> int:
     )
 
 
-def _get_matrix_a(buttons: list[list[int]], target_size: int) -> np.ndarray:
-    res = np.zeros((target_size, len(buttons)), dtype=float)
-
-    for button_num, button in enumerate(buttons):
-        for pos in button:
-            res[pos][button_num] = 1
-    return res
-
-
-def _get_matrix_b(target: tuple[int, ...]) -> np.ndarray:
-    return np.array([[_] for _ in target], dtype=float)
-
-
-def _safe_round(in_val: float | None) -> int:
-    assert isinstance(in_val, float)
-    res = round(in_val)
-    assert abs(res - in_val) < 0.0000001
-    return res
-
-
 def _minimal_number_of_presses_b(
     target: tuple[int, ...], buttons: list[list[int]]
 ) -> int:
-    mat_a = _get_matrix_a(buttons, len(target))
-    mat_b = _get_matrix_b(target)
-    sol = scipy.optimize.linprog(
-        c=np.ones(len(buttons), dtype=float), A_eq=mat_a, b_eq=mat_b, integrality=1
-    )
-    assert sol.success
-    return _safe_round(sol.fun)
+    opt = z3.Optimize()
+    presses = []
+    for b_num in range(len(buttons)):
+        press = z3.Int(f"p_{b_num}")
+        opt.add(press >= 0)
+        presses.append(press)
+    opt.minimize(sum(presses))
+
+    for num, goal in enumerate(target):
+        this_sum = []
+        for b_num, button in enumerate(buttons):
+            if num in button:
+                this_sum.append(presses[b_num])
+        opt.add(sum(this_sum) == goal)
+
+    assert opt.check() == z3.sat
+    model = opt.model()
+    return sum(model[press].as_long() for press in presses)
 
 
 def solve_b(in_str: str) -> int:

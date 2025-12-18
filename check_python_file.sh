@@ -21,6 +21,11 @@ do
         printf "Checking with mypy:\n%s\n" "${mypy_output}"
         exit_code=1
     }
+
+    xenon_output=$(uv run xenon --max-absolute B --max-modules A --max-average A "${cur_file}" 2>&1) || {
+        printf "Checking with xenon:\n%s\n" "${xenon_output}"
+        exit_code=1
+    }
 done
 
 if [[ ${exit_code} -eq 0 ]] ; then

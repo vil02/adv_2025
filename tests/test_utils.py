@@ -25,15 +25,6 @@ def project_folder() -> pathlib.Path:
     return res.resolve()
 
 
-def read_to_string(in_file_path: pathlib.Path) -> str:
-    """reads a file to a string"""
-    assert in_file_path.is_file()
-    with open(in_file_path, "r", encoding="utf-8") as in_file:
-        data_str = in_file.read()
-    assert data_str
-    return data_str
-
-
 def input_data_folder() -> pathlib.Path:
     """returns the path of the with test input data"""
     res = project_folder() / "tests" / "test_input_data"
@@ -67,7 +58,7 @@ def _input_exists(in_day_id: int, in_type_id: str) -> bool:
 def _read_input(in_day_id: int, in_type_id: str) -> str | None:
     """returns specified test input as a string"""
     if _input_exists(in_day_id, in_type_id):
-        return read_to_string(_input_path(in_day_id, in_type_id))
+        return _input_path(in_day_id, in_type_id).read_text(encoding="utf-8")
     return None
 
 

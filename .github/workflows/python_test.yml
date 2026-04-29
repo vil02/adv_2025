@@ -47,7 +47,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-          uv pip install .[dev]
+          uv pip compile --extra dev --generate-hashes --output-file=requirements-dev.txt  pyproject.toml
+          uv lock
+          uv pip install --no-build --require-hashes -r requirements-dev.txt
 
       - name: Run liter
         run: |
@@ -55,5 +57,5 @@ jobs:
 
       - name: Test with pytest
         run: |
-          uv run pytest -n 2
+          uv run --frozen --no-build pytest -n 2
 ...

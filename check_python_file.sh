@@ -7,22 +7,22 @@ declare -i exit_code=0
 for cur_file in "$@"
 do
     printf "Checking \"%s\"\n" "${cur_file}"
-    pylint_output=$(uv run pylint "${cur_file}" 2>&1) || {
+    pylint_output=$(uv run --frozen --no-build pylint "${cur_file}" 2>&1) || {
         printf "Checking with pylint:\n%s\n" "${pylint_output}"
         exit_code=1
     }
 
-    flake8_output=$(uv run flake8 "${cur_file}" --count --max-line-length=88 --show-source --ignore=E203,W503 2>&1) || {
+    flake8_output=$(uv run --frozen --no-build flake8 "${cur_file}" --count --max-line-length=88 --show-source --ignore=E203,W503 2>&1) || {
         printf "Checking with flake8:\n%s\n" "${flake8_output}"
         exit_code=1
     }
 
-    mypy_output=$(uv run mypy --strict "${cur_file}" 2>&1) || {
+    mypy_output=$(uv run --frozen --no-build mypy --strict "${cur_file}" 2>&1) || {
         printf "Checking with mypy:\n%s\n" "${mypy_output}"
         exit_code=1
     }
 
-    xenon_output=$(uv run xenon --max-absolute B --max-modules A --max-average A "${cur_file}" 2>&1) || {
+    xenon_output=$(uv run --frozen --no-build xenon --max-absolute B --max-modules A --max-average A "${cur_file}" 2>&1) || {
         printf "Checking with xenon:\n%s\n" "${xenon_output}"
         exit_code=1
     }

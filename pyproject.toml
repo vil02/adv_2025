@@ -9,7 +9,7 @@ dependencies = [
     "scipy==1.18.0",
     "scipy-stubs==1.18.0.0",
     "shapely==2.1.2",
-    "types-shapely==2.1.0.20260603"
+    "types-shapely==2.1.0.20260630"
 ]
 
 [project.optional-dependencies]

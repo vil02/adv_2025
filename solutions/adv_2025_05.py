@@ -1,3 +1,6 @@
+import itertools
+
+
 def _parse_id(in_str: str) -> int:
     return int(in_str)
 
@@ -65,7 +68,7 @@ def _number_of_elements(start: int, end: int) -> int:
 
 def _assert_merged(merged_ranges: list[tuple[int, int]]) -> None:
     assert merged_ranges == sorted(merged_ranges)
-    for _prev, _next in zip(merged_ranges[:-1], merged_ranges[1:], strict=True):
+    for _prev, _next in itertools.pairwise(merged_ranges):
         assert _prev[1] < _next[0]
 
 

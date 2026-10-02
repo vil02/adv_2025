@@ -19,7 +19,7 @@ dev = [
     "flake8-bugbear==26.9.9",
     "flake8-pytest-style==2.2.0",
     "flake8==7.3.0",
-    "isort==9.0.1",
+    "isort==9.0.2",
     "mypy==2.3.1",
     "pylint==4.0.8",
     "pyright[nodejs]==1.1.414",

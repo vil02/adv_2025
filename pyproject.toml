@@ -5,7 +5,7 @@ description = "solutions of Advent of Code 2025"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "numpy==2.5.3",
+    "numpy==2.5.4",
     "scipy==1.18.1",
     "scipy-stubs==1.18.1.1",
     "shapely==2.2.0",
